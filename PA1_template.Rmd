@@ -85,26 +85,26 @@ First, we create a new factor variable with two levels -- "weekday" and "weekend
 finalData <- imputedData
 finalData <- ddply(finalData, "date", transform, day = weekdays(date))
 weekends <- finalData$day == "neděle" | finalData$day == "sobota"
-finalData$dayType <- "weekend"
-finalData$dayType[!weekends] <- "weekday"
-finalData$dayType <- as.factor(finalData$dayType)
+finalData$subset <- "weekend"
+finalData$subset[!weekends] <- "weekday"
+finalData$subset <- as.factor(finalData$subset)
 ```
 Second, we split the data to weekends and weekdays, and again we calculate the mean and median total number of steps taken per day for each of the two new datasets.
 ```{r}
-weekendData <- finalData[finalData$dayType == "weekend",]
-weekendAverages <- ddply(weekendData, "interval", summarise, avgSteps = mean(steps))
-weekdayData <- finalData[finalData$dayType == "weekday",]
-weekdayAverages <- ddply(weekdayData, "interval", summarise, avgSteps = mean(steps))
+weekends <- finalData[finalData$subset == "weekend",]
+avgWeekends <- ddply(weekends, "interval", summarise, avgSteps = mean(steps))
+weekdays <- finalData[finalData$subset == "weekday",]
+avgWeekdays <- ddply(weekdays, "interval", summarise, avgSteps = mean(steps))
 ```
 
 Finally, we plot these two new datasets to see if the pattern differs for weekdays and weekends:
 ```{r}
-par(mfrow = c(2,1), mar = c(3,3,2,1))
-with(weekendAverages, plot(interval, avgSteps,  col="green", type = "l", xlab = "Interval", ylab = "Average Steps", main = "Average Steps on Weekends"))
-with(weekdayAverages, plot(interval, avgSteps, col="green", type = "l", xlab = "Interval", ylab = "Average Steps", main = "Average Steps on Weekdays"))
+par(mfrow = c(2,1))
+with(avgWeekends, plot(interval, avgSteps,  col="green", type = "l", xlab = "Interval", ylab = "Average Steps", main = "Average Steps on Weekends"))
+with(avgWeekdays, plot(interval, avgSteps, col="green", type = "l", xlab = "Interval", ylab = "Average Steps", main = "Average Steps on Weekdays"))
 ```
 
-As we can see in the output, the pattern is significantly different on weekends. The persons seems to be getting up later on weekends. Also, instead of sitting at work, the person is clearly walking much more from approx. 10:00AM until the evening.
+As we can see in the output, the pattern is significantly different on weekends. The person seems to be getting up later on weekends. Also, instead of sitting at work, the person is clearly walking much more from approx. 10:00AM until the evening.
 
 
 
